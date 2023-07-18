@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// DATABASE_URL="mysql://root:Password@localhost:3306/spacevoz"
+
+model Accounts {
+  id String @unique @id
+  name String
+  balance Float
+  email String @unique
+  password String
+  PhoneLines PhoneLines[]
+  Transactions Transactions[]
+  RingTonesBuyed RingTonesBuyed[]
+}
+
+model Transactions {
+  id String @unique @id
+  data String
+  name String
+  tipoTransacao String
+  valor Float
+  userId String
+  Accounts Accounts @relation(fields: [userId], references: [id])
+}
+
+model PhoneLines {
+  msisdn String @unique @id
+  accountId String
+  activated Boolean @default(false)
+  extraCall Boolean @default(false)
+  Accounts Accounts @relation(fields: [accountId], references: [id])
+  ringActived String
+  RingTonesBuyed RingTonesBuyed @relation(fields: [ringActived], references: [buyedId])
+}
+
+model RingTones {
+  ringId String @unique @id
+  ringName String
+  ringAuthor String
+  filePath String
+  coverPath String
+  price Float
+  RingTonesBuyed RingTonesBuyed[]
+}
+
+model RingTonesBuyed {
+  buyedId String @unique @id
+  accountId String
+  Accounts Accounts @relation(fields: [accountId], references: [id])
+  ringId String
+  RingTones RingTones @relation(fields: [ringId], references: [ringId])
+  PhoneLines PhoneLines[]
+}
